@@ -1,76 +1,53 @@
 # RSS Feed Source
 
-Simple Java application to fetch & output RSS feeds.
+Simple message-driven Java application to fetch & output RSS feeds.
 
-**Main Java dependencies**
-- ROME
-- Spring Cloud
+Currently only supports RabbitMQ.
 
-## Build
+Uses `If-Modified-Since` HTTP header using REDIS storage.
 
+## TL;DR;
+
+```console
+$ helm install ??
 ```
-# java
-./mvn install
-
-# docker
-cd target && docker build -t data-source-rss .
-```
-
-## Run
-
-**Requirements**
-- RabbitMQ message broker
-- Redis
-
-```
-java -jar target/data-source-rss.jar
-
-# or
-
-docker run data-source-rss
-```
-
-Send a sample
-
-```json
-{
-  "url": "https://feeds.feedburner.com/les-crises-fr"
-}
-```
-
 ## Configuration
 
-Configuration can be done via classic Spring BOOT configuration.
+The following table lists the configurable parameters of the Prometheus chart and their default values.
 
-See [application.yml](src/main/resources/application.yml) for an example
+This application uses Spring Cloud stream, configuration can be found [there](https://docs.spring.io/spring-cloud-stream/docs/current/reference/htmlsingle/#_configuration_options).
 
-## Input Message
+Logging override etc...
 
-```json
-{
-  "url": "https://feeds.com"
-}
+For example, to have this application DEBUG output add
+
+```yml
+applicationConfig:
+    logging:
+        level:
+            fr:
+                asso:
+                    placeholder: DEBUG
 ```
 
-## Output Message
-[DublinCoreModule](src/main/java/fr/asso/placeholder/data/sources/rss/models/DublinCoreModule.java)
-```json
-{
-  "uri": "entry url",
-  "link": "entry uri",
-  "title": "title",
-  "publishedDate": "2019-12-08T05:30:27.000+0000",
-  "description": {
-    "type": "html",
-    "value": "<p>This is a nice entry</p>"
-  },
-  "contents": [{ "type": "html", "value": "<p>Some content</p>" }, ... ],
-  "authors": [{ "type": "text", "value": "Jean Marie" }],
-  "contributors": [{ "type": "text", "value": "Jean Marie" }],
-  "source": "https://feeds.url/",
-  "modules": [{ }],
-  "enclosures": [{ "url": "http://image.jpg", "type": "jpg", "length": "2134354"}],
-  "categories": [{ "name": "Category 1", "taxonomyUri": ""}],
-  "updatedDate": "2019-12-08T05:30:27.000+0000"
-}
-```
+The key `applicationConfig` can hold all the `application.yml` config for Spring. Below are the common / required ones.
+
+Parameter | Description | Default
+--------- | ----------- | -------
+`image.repository` | Image to use | `127.0.0.1:34309/data-source-rss`
+`image.pullPolicy`| Container image pull policy | `IfNotPresent`
+`applicationConfig.*`| Everything there will be created as a ConfigMap | `acquisition-in`
+`applicationConfig.spring.cloud.stream.bindings.input.destination`| Queue to listen to | `acquisition-in`
+`applicationConfig.spring.cloud.stream.bindings.input.group`| Consumer group to use | `data-source-rss`
+`applicationConfig.spring.cloud.stream.bindings.input.binder`| Binder to use | `rabbit` is the only one supported
+`applicationConfig.spring.cloud.stream.bindings.output.destination`| Queue to output data to | `acquisition-out`
+`applicationConfig.spring.cloud.stream.rabbit.bindings.input.consumer.bindingRoutingKey`| *RabbitMQ* Consumer routing key | `acquisition-out`
+`applicationConfig.spring.cloud.stream.rabbit.bindings.output.producer.bindingRoutingKey`| *RabbitMQ* Producer routing key | `rss`
+`applicationConfig.spring.cloud.stream.rabbit.bindings.output.producer.routing-key-expression`| *RabbitMQ* Producer routing key | `rss`
+`applicationConfig.spring.cloud.stream.binders.rabbit.environment.spring.rabbitmq.host`| *RabbitMQ* host | `localhost`
+`applicationConfig.spring.cloud.stream.binders.rabbit.environment.spring.rabbitmq.port`| *RabbitMQ* port | `5672`
+`applicationConfig.spring.cloud.stream.binders.rabbit.environment.spring.rabbitmq.username`| *RabbitMQ* username | `admin`
+`applicationConfig.spring.cloud.stream.binders.rabbit.environment.spring.rabbitmq.password`| *RabbitMQ* password | `admin`
+`applicationConfig.spring.cloud.stream.binders.rabbit.environment.spring.rabbitmq.virtual-host`| *RabbitMQ* virtual-host | `admin`
+`applicationConfig.spring.redis.host`| Redis host | `localhost`
+`applicationConfig.spring.redis.port`| Redis port | `localhost`
