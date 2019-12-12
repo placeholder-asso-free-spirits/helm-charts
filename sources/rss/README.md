@@ -48,6 +48,6 @@ Parameter | Description | Default
 `applicationConfig.spring.cloud.stream.binders.rabbit.environment.spring.rabbitmq.port`| *RabbitMQ* port | `5672`
 `applicationConfig.spring.cloud.stream.binders.rabbit.environment.spring.rabbitmq.username`| *RabbitMQ* username | `admin`
 `applicationConfig.spring.cloud.stream.binders.rabbit.environment.spring.rabbitmq.password`| *RabbitMQ* password | `admin`
-`applicationConfig.spring.cloud.stream.binders.rabbit.environment.spring.rabbitmq.virtual-host`| *RabbitMQ* virtual-host | `admin`
+`applicationConfig.spring.cloud.stream.binders.rabbit.environment.spring.rabbitmq.virtual-host`| *RabbitMQ* virtual-host | `/`
 `applicationConfig.spring.redis.host`| Redis host | `localhost`
 `applicationConfig.spring.redis.port`| Redis port | `localhost`
